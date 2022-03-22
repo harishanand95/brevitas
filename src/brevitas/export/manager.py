@@ -243,7 +243,10 @@ class BaseManager(ABC):
         with ExitStack() as stack:
             for mgr in cls._cache_patches():
                 stack.enter_context(mgr)
-            _ = module.forward(input_t)
+            if isinstance(input_t, tuple):
+                _ = module.forward(*input_t)
+            else:
+                _ = module.forward(input_t)
         # Restore previous caching properties
         module.apply(lambda m: _restore_quant_metadata_caching_mode(m))
         module.apply(lambda m: _restore_bias_caching_mode(m))
